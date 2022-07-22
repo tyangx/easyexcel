@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.alibaba.easyexcel.test.demo.excel.BusinessSlotData;
 import com.alibaba.easyexcel.test.util.TestFileUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
@@ -64,35 +65,20 @@ public class WriteTest {
      * <p>
      * 2. 直接写即可
      */
-    @Test
-    public void simpleWrite() {
+    public static void simpleWrite(List<BusinessSlotData> dataList) {
         // 注意 simpleWrite在数据量不大的情况下可以使用（5000以内，具体也要看实际情况），数据量大参照 重复多次写入
 
         // 写法1 JDK8+
         // since: 3.0.0-beta1
-        String fileName = TestFileUtil.getPath() + "simpleWrite" + System.currentTimeMillis() + ".xlsx";
+        String fileName = "/Users/xietongyang/Desktop/" + "simpleWrite" + System.currentTimeMillis() + ".xlsx";
         // 这里 需要指定写用哪个class去写，然后写到第一个sheet，名字为模板 然后文件流会自动关闭
         // 如果这里想使用03 则 传入excelType参数即可
         EasyExcel.write(fileName, DemoData.class)
             .sheet("模板")
             .doWrite(() -> {
                 // 分页查询数据
-                return data();
+                return dataList;
             });
-
-        // 写法2
-        fileName = TestFileUtil.getPath() + "simpleWrite" + System.currentTimeMillis() + ".xlsx";
-        // 这里 需要指定写用哪个class去写，然后写到第一个sheet，名字为模板 然后文件流会自动关闭
-        // 如果这里想使用03 则 传入excelType参数即可
-        EasyExcel.write(fileName, DemoData.class).sheet("模板").doWrite(data());
-
-        // 写法3
-        fileName = TestFileUtil.getPath() + "simpleWrite" + System.currentTimeMillis() + ".xlsx";
-        // 这里 需要指定写用哪个class去写
-        try (ExcelWriter excelWriter = EasyExcel.write(fileName, DemoData.class).build()) {
-            WriteSheet writeSheet = EasyExcel.writerSheet("模板").build();
-            excelWriter.write(data(), writeSheet);
-        }
     }
 
     /**
@@ -559,8 +545,9 @@ public class WriteTest {
         fileName = TestFileUtil.getPath() + "mergeWrite" + System.currentTimeMillis() + ".xlsx";
         // 每隔2行会合并 把eachColumn 设置成 3 也就是我们数据的长度，所以就第一列会合并。当然其他合并策略也可以自己写
         LoopMergeStrategy loopMergeStrategy = new LoopMergeStrategy(2, 0);
+        LoopMergeStrategy loopMergeStrategy2 = new LoopMergeStrategy(3, 0);
         // 这里 需要指定写用哪个class去写，然后写到第一个sheet，名字为模板 然后文件流会自动关闭
-        EasyExcel.write(fileName, DemoData.class).registerWriteHandler(loopMergeStrategy).sheet("模板").doWrite(data());
+        EasyExcel.write(fileName, DemoData.class).registerWriteHandler(loopMergeStrategy).registerWriteHandler(loopMergeStrategy2).sheet("模板").doWrite(data());
     }
 
     /**
@@ -750,10 +737,10 @@ public class WriteTest {
     }
 
     private List<DemoData> data() {
-        List<DemoData> list = ListUtils.newArrayList();
+        List<DemoData> list = new ArrayList<DemoData>();
         for (int i = 0; i < 10; i++) {
             DemoData data = new DemoData();
-            data.setString("字符串" + i);
+            data.setString("字符串" + 0);
             data.setDate(new Date());
             data.setDoubleData(0.56);
             list.add(data);
